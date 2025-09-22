@@ -32,10 +32,9 @@
 - **AI Integration:** [Google Gemini AI](https://ai.google.dev/)
 - **UI Components:** [shadcn/ui](https://ui.shadcn.com/) + [Radix UI](https://radix-ui.com/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Charts:** [Recharts](https://recharts.org/)
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **Build Tool:** Turbopack
-- **Testing:** [Playwright](https://playwright.dev/)
+- **Screenshot Automation:** [Playwright](https://playwright.dev/)
 
 ## 🛠️ Development
 
