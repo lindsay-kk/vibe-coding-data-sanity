@@ -2,7 +2,7 @@
 
 > A comprehensive data quality assessment platform that helps you analyze, validate, and get AI-powered insights on your datasets.
 
-![Data Sanity Dashboard](screenshots/screenshots/dashboard-screen.png)
+![Data Sanity Dashboard](screenshots/screenshots/dashboard-screen-light.png)
 
 ## ✨ Features
 
@@ -10,19 +10,19 @@
 - 📊 **Multi-format Data Support** - Upload CSV files or connect Google Sheets directly
 - 🤖 **AI-Powered Analysis** - Get intelligent insights and recommendations using Google Gemini AI
 - 📈 **Interactive Reports** - Comprehensive data quality reports with visualizations
-- 🎨 **Modern UI** - Clean, responsive design with dark theme support
+- 🎨 **Modern UI** - Clean, responsive design with light/dark theme support
 - ⚡ **Real-time Processing** - Live feedback during data analysis
 
 ## 🖼️ Screenshots
 
 ### Login Screen
-![Login Screen](screenshots/screenshots/login-screen.png)
+![Login Screen](screenshots/screenshots/login-screen-light.png)
 
 ### Data Processing
-![Processing Screen](screenshots/screenshots/processing-screen.png)
+![Processing Screen](screenshots/screenshots/processing-screen-light.png)
 
 ### Detailed Reports
-![Report Screen](screenshots/screenshots/report-screen.png)
+![Report Screen](screenshots/screenshots/report-screen-light.png)
 
 ## 🚀 Built With
 

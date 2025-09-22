@@ -16,6 +16,8 @@ import {
   Zap
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 import type { User } from '@supabase/supabase-js'
 
 interface ReportData {
@@ -169,53 +171,46 @@ export default function ReportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/5 via-gray-500/5 to-gray-700/5"></div>
-        <div className="absolute top-20 right-20 w-96 h-96 bg-gray-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
-        <div className="text-center relative z-10">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-8">
-            <RefreshCw className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin" />
-            <p className="text-white text-lg font-medium">Loading report...</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center p-8">
+            <RefreshCw className="w-12 h-12 text-muted-foreground mx-auto mb-4 animate-spin" />
+            <p className="text-foreground text-lg font-medium">Loading report...</p>
+          </CardContent>
+        </Card>
+        <ThemeSwitcher />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/5 via-gray-500/5 to-gray-700/5"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse"></div>
-        <div className="max-w-md w-full relative z-10">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Error</h1>
-            <p className="text-gray-300 mb-6">{error}</p>
-            <Button
-              onClick={() => router.push('/')}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center p-6">
+            <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">Report Error</h2>
+            <p className="text-muted-foreground mb-6 text-center">{error}</p>
+            <Button onClick={() => router.push('/')}>
               Go Back Home
             </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
+        <ThemeSwitcher />
       </div>
     )
   }
 
   if (!reportData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/5 via-gray-500/5 to-gray-700/5"></div>
-        <div className="text-center relative z-10">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-8">
-            <FileX className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg">No report data found</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center p-8">
+            <FileX className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-foreground text-lg">No report data found</p>
+          </CardContent>
+        </Card>
+        <ThemeSwitcher />
       </div>
     )
   }
@@ -223,257 +218,260 @@ export default function ReportPage() {
   const { report, file, issues, insights, annotations } = reportData
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-600/5 via-gray-500/5 to-gray-700/5"></div>
-      <div className="absolute top-20 right-20 w-96 h-96 bg-gray-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-gray-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>
-
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="relative z-10 bg-white/5 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-white" />
+              <div className="flex size-8 items-center justify-center rounded-md bg-black">
+                <CheckCircle className="size-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">Data Sanity Report</h1>
+              <h1 className="text-xl font-semibold">Data Sanity Report</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-300">Welcome, {user?.email}</span>
-              <button
+              <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <Button
                 onClick={() => router.push('/')}
-                className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-1 rounded-lg hover:bg-white/10"
+                variant="ghost"
+                size="sm"
               >
                 New Analysis
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto p-6">
+      <main className="container mx-auto max-w-4xl p-6">
         {/* Status Section */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-2">
-                {file?.original_filename || 'Google Sheet'}
-              </h2>
-              <div className="flex items-center space-x-4">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  report.status === 'complete' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
-                  report.status === 'processing' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
-                  'bg-red-500/20 text-red-300 border border-red-500/30'
-                }`}>
-                  {report.status === 'processing' && <RefreshCw className="w-4 h-4 mr-2 animate-spin" />}
-                  {report.status === 'complete' && <CheckCircle className="w-4 h-4 mr-2" />}
-                  {report.status === 'failed' && <AlertCircle className="w-4 h-4 mr-2" />}
-                  {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                </span>
-                {polling && <span className="text-sm text-gray-400">Auto-refreshing...</span>}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">
+                  {file?.original_filename || 'Google Sheet'}
+                </h2>
+                <div className="flex items-center space-x-4">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    report.status === 'complete' ? 'bg-green-500/20 text-green-600 border border-green-500/30' :
+                    report.status === 'processing' ? 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/30' :
+                    'bg-red-500/20 text-red-600 border border-red-500/30'
+                  }`}>
+                    {report.status === 'processing' && <RefreshCw className="w-4 h-4 mr-2 animate-spin" />}
+                    {report.status === 'complete' && <CheckCircle className="w-4 h-4 mr-2" />}
+                    {report.status === 'failed' && <AlertCircle className="w-4 h-4 mr-2" />}
+                    {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
+                  </span>
+                  {polling && <span className="text-sm text-muted-foreground">Auto-refreshing...</span>}
+                </div>
               </div>
+              {report.status === 'complete' && annotations && (
+                <div className="flex space-x-3">
+                  {annotations.annotation_type === 'file' && annotations.annotated_file_url && (
+                    <Button
+                      onClick={downloadAnnotatedFile}
+                      className="flex items-center"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Annotated File
+                    </Button>
+                  )}
+                  {annotations.annotation_type === 'google_sheet' && annotations.google_sheet_url && (
+                    <Button
+                      onClick={openGoogleSheet}
+                      className="flex items-center"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Open Annotated Sheet
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
-            {report.status === 'complete' && annotations && (
-              <div className="flex space-x-3">
-                {annotations.annotation_type === 'file' && annotations.annotated_file_url && (
-                  <Button
-                    onClick={downloadAnnotatedFile}
-                    className="flex items-center bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Annotated File
-                  </Button>
-                )}
-                {annotations.annotation_type === 'google_sheet' && annotations.google_sheet_url && (
-                  <Button
-                    onClick={openGoogleSheet}
-                    className="flex items-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Open Annotated Sheet
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {report.status === 'processing' && (
-          <div className="bg-yellow-500/10 backdrop-blur-lg border border-yellow-500/30 rounded-2xl p-6 mb-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mr-4">
-                <RefreshCw className="w-6 h-6 text-white animate-spin" />
+          <Card className="border-yellow-500/30 bg-yellow-500/5 mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mr-4">
+                  <RefreshCw className="w-6 h-6 text-yellow-600 animate-spin" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Processing Your Data</h3>
+                  <p className="text-muted-foreground">
+                    We're analyzing your dataset and generating insights. This usually takes 30-60 seconds.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-yellow-300">Processing Your Data</h3>
-                <p className="text-yellow-200">
-                  We're analyzing your dataset and generating insights. This usually takes 30-60 seconds.
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {report.status === 'failed' && (
-          <div className="bg-red-500/10 backdrop-blur-lg border border-red-500/30 rounded-2xl p-6 mb-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center mr-4">
-                <AlertCircle className="w-6 h-6 text-white" />
+          <Card className="border-red-500/30 bg-red-500/5 mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mr-4">
+                  <AlertCircle className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Processing Failed</h3>
+                  <p className="text-muted-foreground">
+                    There was an error processing your dataset. Please try uploading again or contact support.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-red-300">Processing Failed</h3>
-                <p className="text-red-200">
-                  There was an error processing your dataset. Please try uploading again or contact support.
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Summary Statistics */}
         {issues && (
           <div className="grid md:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6 hover:bg-white/15 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-                  <FileSpreadsheet className="w-6 h-6 text-white" />
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="size-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <FileSpreadsheet className="size-6 text-blue-600" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-300">Dataset Size</p>
-                  <p className="text-2xl font-bold text-white">
-                    {issues.summary.total_rows.toLocaleString()} × {issues.summary.total_columns}
-                  </p>
-                </div>
-              </div>
-            </div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">Dataset Size</h4>
+                <p className="text-2xl font-bold text-foreground">
+                  {issues.summary.total_rows.toLocaleString()} × {issues.summary.total_columns}
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6 hover:bg-white/15 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mr-4">
-                  <AlertCircle className="w-6 h-6 text-white" />
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="size-10 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="size-6 text-yellow-600" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-300">Missing Values</p>
-                  <p className="text-2xl font-bold text-white">{issues.summary.missing_values.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">Missing Values</h4>
+                <p className="text-2xl font-bold text-foreground">{issues.summary.missing_values.toLocaleString()}</p>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6 hover:bg-white/15 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center mr-4">
-                  <Users className="w-6 h-6 text-white" />
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="size-10 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Users className="size-6 text-red-600" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-300">Duplicates</p>
-                  <p className="text-2xl font-bold text-white">{issues.summary.duplicates.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">Duplicates</h4>
+                <p className="text-2xl font-bold text-foreground">{issues.summary.duplicates.toLocaleString()}</p>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6 hover:bg-white/15 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mr-4">
-                  <TrendingUp className="w-6 h-6 text-white" />
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="size-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="size-6 text-green-600" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-300">Total Issues</p>
-                  <p className="text-2xl font-bold text-white">
-                    {(issues.summary.missing_values +
-                      issues.summary.duplicates +
-                      issues.summary.inconsistent_formats +
-                      issues.summary.outliers +
-                      issues.summary.type_mismatches).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">Total Issues</h4>
+                <p className="text-2xl font-bold text-foreground">
+                  {(issues.summary.missing_values +
+                    issues.summary.duplicates +
+                    issues.summary.inconsistent_formats +
+                    issues.summary.outliers +
+                    issues.summary.type_mismatches).toLocaleString()}
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
 
         {/* AI Insights */}
         {insights && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6 mb-6">
-            <div className="flex items-center mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-white">AI Insights</h3>
-            </div>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-purple-100">
+                  <Zap className="size-5 text-purple-600" />
+                </div>
+                AI Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-lg font-medium text-foreground mb-3">Summary</h4>
+                  <div className="prose prose-sm text-muted-foreground">
+                    {insights.gemini_summary.split('\n').map((line, index) => (
+                      <p key={index} className="mb-2">{line}</p>
+                    ))}
+                  </div>
+                </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="text-lg font-medium text-white mb-3">Summary</h4>
-                <div className="prose prose-sm text-gray-300">
-                  {insights.gemini_summary.split('\n').map((line, index) => (
-                    <p key={index} className="mb-2">{line}</p>
-                  ))}
+                <div>
+                  <h4 className="text-lg font-medium text-foreground mb-3">Recommendations</h4>
+                  <div className="prose prose-sm text-muted-foreground">
+                    {insights.gemini_recommendations.split('\n').map((line, index) => (
+                      <p key={index} className="mb-2">{line}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <h4 className="text-lg font-medium text-white mb-3">Recommendations</h4>
-                <div className="prose prose-sm text-gray-300">
-                  {insights.gemini_recommendations.split('\n').map((line, index) => (
-                    <p key={index} className="mb-2">{line}</p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Issues Breakdown */}
         {issues && Object.keys(issues.issues_json).length > 0 && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-6">Issues by Column</h3>
+          <Card>
+            <CardHeader>
+              <CardTitle>Issues by Column</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {Object.entries(issues.issues_json).map(([columnName, columnIssues]) => {
+                  if (columnIssues.length === 0) return null
 
-            <div className="space-y-6">
-              {Object.entries(issues.issues_json).map(([columnName, columnIssues]) => {
-                if (columnIssues.length === 0) return null
+                  return (
+                    <div key={columnName} className="border-l-4 border-primary pl-4">
+                      <h4 className="text-lg font-medium text-foreground mb-3">
+                        {columnName} ({columnIssues.length} issues)
+                      </h4>
 
-                return (
-                  <div key={columnName} className="border-l-4 border-purple-400 pl-4">
-                    <h4 className="text-lg font-medium text-white mb-3">
-                      {columnName} ({columnIssues.length} issues)
-                    </h4>
-
-                    <div className="grid gap-2">
-                      {columnIssues.slice(0, 10).map((issue, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 backdrop-blur-lg rounded-xl border border-white/10">
-                          <div className="flex items-center space-x-3">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium ${
-                              issue.issue === 'missing_value' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
-                              issue.issue === 'duplicate' ? 'bg-red-500/20 text-red-300 border border-red-500/30' :
-                              issue.issue === 'inconsistent_format' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                              issue.issue === 'outlier' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' :
-                              'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                            }`}>
-                              {issue.issue.replace('_', ' ')}
-                            </span>
-                            <span className="text-sm text-gray-400">Row {issue.row}</span>
-                            <span className="text-sm text-gray-300 font-mono">"{issue.value}"</span>
+                      <div className="grid gap-2">
+                        {columnIssues.slice(0, 10).map((issue, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg border">
+                            <div className="flex items-center space-x-3">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium ${
+                                issue.issue === 'missing_value' ? 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/30' :
+                                issue.issue === 'duplicate' ? 'bg-red-500/20 text-red-600 border border-red-500/30' :
+                                issue.issue === 'inconsistent_format' ? 'bg-blue-500/20 text-blue-600 border border-blue-500/30' :
+                                issue.issue === 'outlier' ? 'bg-orange-500/20 text-orange-600 border border-orange-500/30' :
+                                'bg-purple-500/20 text-purple-600 border border-purple-500/30'
+                              }`}>
+                                {issue.issue.replace('_', ' ')}
+                              </span>
+                              <span className="text-sm text-muted-foreground">Row {issue.row}</span>
+                              <span className="text-sm text-foreground font-mono">"{issue.value}"</span>
+                            </div>
+                            {issue.details && (
+                              <span className="text-xs text-muted-foreground">{issue.details}</span>
+                            )}
                           </div>
-                          {issue.details && (
-                            <span className="text-xs text-gray-400">{issue.details}</span>
-                          )}
-                        </div>
-                      ))}
+                        ))}
 
-                      {columnIssues.length > 10 && (
-                        <div className="text-sm text-gray-400 text-center py-2">
-                          ... and {columnIssues.length - 10} more issues
-                        </div>
-                      )}
+                        {columnIssues.length > 10 && (
+                          <div className="text-sm text-muted-foreground text-center py-2">
+                            ... and {columnIssues.length - 10} more issues
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </main>
+
+      {/* Theme Switcher */}
+      <ThemeSwitcher />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { Upload, FileSpreadsheet, Link2, CheckCircle, AlertCircle } from 'lucide
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DataSanityLoginForm } from '@/components/data-sanity-login-form'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 import type { User } from '@supabase/supabase-js'
 
 export default function DataSanityPage() {
@@ -174,6 +175,9 @@ export default function DataSanityPage() {
         <div className="w-full max-w-sm">
           <DataSanityLoginForm onSignIn={signIn} />
         </div>
+
+        {/* Theme Switcher */}
+        <ThemeSwitcher />
       </div>
     )
   }
@@ -362,6 +366,9 @@ export default function DataSanityPage() {
           </div>
         )}
       </main>
+
+      {/* Theme Switcher */}
+      <ThemeSwitcher />
     </div>
   )
 }

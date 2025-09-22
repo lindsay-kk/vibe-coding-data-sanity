@@ -31,11 +31,6 @@ export function DataSanityLoginForm({
               AI-powered data validation & insights platform
             </div>
           </div>
-          <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-            <span className="bg-background text-muted-foreground relative z-10 px-2">
-              Or
-            </span>
-          </div>
           <div className="grid gap-4">
             <Button onClick={onSignIn} variant="outline" type="button" className="w-full">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
