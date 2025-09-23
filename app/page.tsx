@@ -3,11 +3,12 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/auth'
-import { Upload, FileSpreadsheet, Link2, CheckCircle, AlertCircle } from 'lucide-react'
+import { Upload, FileSpreadsheet, Link2, CheckCircle, AlertCircle, Blend } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DataSanityLoginForm } from '@/components/data-sanity-login-form'
 import { ThemeSwitcher } from '@/components/theme-switcher'
+import { DataSanityNav } from '@/components/data-sanity-nav'
 import type { User } from '@supabase/supabase-js'
 
 export default function DataSanityPage() {
@@ -188,21 +189,15 @@ export default function DataSanityPage() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               <div className="flex size-8 items-center justify-center rounded-md bg-black">
                 <CheckCircle className="size-5 text-white" />
               </div>
               <h1 className="text-xl font-semibold">Data Sanity</h1>
+              <span className="text-xl font-light text-muted-foreground">/</span>
+              <DataSanityNav user={user} onSignOut={() => setUser(null)} />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">{user.email}</span>
-              <Button
-                onClick={signOut}
-                variant="ghost"
-                size="sm"
-              >
-                Sign out
-              </Button>
             </div>
           </div>
         </div>
@@ -319,7 +314,7 @@ export default function DataSanityPage() {
                 bg: 'bg-red-100',
               },
               {
-                icon: CheckCircle,
+                icon: Blend,
                 title: 'Duplicates',
                 description: 'Find duplicate rows and key field duplicates',
                 color: 'text-green-600',

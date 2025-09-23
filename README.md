@@ -18,8 +18,8 @@
 ### Login Screen
 ![Login Screen](screenshots/screenshots/login-screen-light.png)
 
-### Data Processing
-![Processing Screen](screenshots/screenshots/processing-screen-light.png)
+### Reports History
+![Reports History](screenshots/screenshots/reports-history-light.png)
 
 ### Detailed Reports
 ![Report Screen](screenshots/screenshots/report-screen-light.png)

@@ -26,46 +26,74 @@ export async function GET(request: NextRequest) {
       try {
         console.log('🔐 Processing sheet with OAuth token:', state)
 
-        // For OAuth flow, we'll create a guest session since user session may be lost during redirect
-        // In a production app, you'd want to handle this more securely
         const { supabaseAdmin } = await import('@/lib/supabase')
+        const { createServerClient } = await import('@supabase/ssr')
+        const { cookies } = await import('next/headers')
 
-        // Create a proper UUID for guest user (temporary solution)
-        const { randomUUID } = require('crypto')
-        const guestUserId = randomUUID()
-        console.log('📝 Creating guest session for OAuth processing:', guestUserId)
-
-        // Create a temporary user first, then create the report
-        console.log('📝 Creating temporary user for OAuth processing...')
-
-        // First, create a user in the base auth.users table using admin
-        let actualUserId = guestUserId
-        try {
-          const tempUserEmail = `oauth-guest-${Date.now()}@temp.local`
-          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-            email: tempUserEmail,
-            password: 'temp-password-' + Date.now(),
-            user_id: guestUserId,
-            email_confirm: true
-          })
-
-          if (authError) {
-            console.error('Failed to create auth user:', authError)
-          } else {
-            actualUserId = authUser.user?.id || guestUserId
-            console.log('✅ Created temp auth user:', actualUserId)
+        // Try to get the current authenticated user
+        const cookieStore = await cookies()
+        const supabase = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            cookies: {
+              getAll() {
+                return cookieStore.getAll()
+              },
+              setAll(cookiesToSet) {
+                cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+              },
+            },
           }
-        } catch (authError) {
-          console.error('Auth user creation error:', authError)
+        )
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+        if (userError || !user) {
+          console.log('❌ No authenticated user found for OAuth callback')
+          return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/?error=authentication_required`)
         }
 
-        // Now create the report with the actual auth user ID
+        console.log('✅ Found authenticated user:', user.id)
+
+        // Get the actual sheet title using OAuth token
+        const { getGoogleSheetTitle } = await import('@/lib/google-sheets')
+        let sheetTitle = 'Google Sheet'
+        try {
+          sheetTitle = await getGoogleSheetTitle(state, tokens.access_token!)
+          console.log('📝 Retrieved sheet title for OAuth:', sheetTitle)
+        } catch (titleError) {
+          console.log('Could not get sheet title with OAuth, using default')
+        }
+
+        // Create file record for Google Sheet
+        const { data: fileData, error: fileError } = await supabaseAdmin
+          .from('files')
+          .insert({
+            user_id: user.id,
+            filename: 'google_sheet',
+            original_filename: sheetTitle,
+            file_size: 0,
+            google_sheet_url: state
+          })
+          .select()
+          .single()
+
+        if (fileError) {
+          console.error('Failed to create file record:', fileError)
+          return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/?error=file_creation_failed`)
+        }
+
+        // Create report record
         const { data: reportData, error: reportError } = await supabaseAdmin
           .from('reports')
           .insert({
-            user_id: actualUserId,
+            file_id: fileData.id,
+            user_id: user.id,
             status: 'processing',
-            google_sheet_url: state
+            google_sheet_url: state,
+            document_name: sheetTitle,
+            document_type: 'google_sheet'
           })
           .select()
           .single()

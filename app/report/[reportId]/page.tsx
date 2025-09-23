@@ -13,7 +13,8 @@ import {
   TrendingUp,
   Users,
   FileX,
-  Zap
+  Zap,
+  Blend
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -356,7 +357,7 @@ export default function ReportPage() {
             <Card className="text-center">
               <CardContent className="pt-6">
                 <div className="size-10 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Users className="size-6 text-red-600" />
+                  <Blend className="size-6 text-red-600" />
                 </div>
                 <h4 className="text-lg font-semibold text-foreground mb-2">Duplicates</h4>
                 <p className="text-2xl font-bold text-foreground">{issues.summary.duplicates.toLocaleString()}</p>

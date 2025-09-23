@@ -449,6 +449,107 @@ function extractSpreadsheetId(sheetUrl: string): string {
   throw new Error('Invalid Google Sheets URL format. Please use a valid Google Sheets URL.')
 }
 
+// Function to get Google Sheets title using OAuth token
+export async function getGoogleSheetTitle(sheetUrl: string, accessToken?: string): Promise<string> {
+  try {
+    const spreadsheetId = extractSpreadsheetId(sheetUrl)
+
+    if (accessToken) {
+      // Use OAuth token to get metadata
+      console.log('📝 Getting sheet title with OAuth token')
+      const oauth2Client = new google.auth.OAuth2()
+      oauth2Client.setCredentials({ access_token: accessToken })
+
+      const sheets = google.sheets({ version: 'v4', auth: oauth2Client })
+
+      const response = await sheets.spreadsheets.get({
+        spreadsheetId,
+        fields: 'properties.title'
+      })
+
+      const title = response.data.properties?.title
+      if (title) {
+        console.log('✅ Retrieved sheet title:', title)
+        return title
+      }
+    }
+
+    // Fallback: try public API access
+    if (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY) {
+      console.log('📝 Trying to get sheet title with API key')
+      const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY
+      const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=properties.title&key=${apiKey}`
+
+      try {
+        const response = await fetch(apiUrl)
+        if (response.ok) {
+          const data = await response.json()
+          const title = data.properties?.title
+          if (title) {
+            console.log('✅ Retrieved sheet title via API:', title)
+            return title
+          }
+        } else {
+          console.log('⚠️ API response not OK:', response.status, response.statusText)
+        }
+      } catch (apiError) {
+        console.log('⚠️ API call failed:', apiError)
+      }
+    }
+
+    // Fallback: try scraping the HTML page for public sheets
+    try {
+      console.log('📝 Trying to extract title from HTML page')
+      const response = await fetch(sheetUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; DataSanityBot/1.0)',
+        },
+      })
+
+      if (response.ok) {
+        const html = await response.text()
+
+        // Look for the title in meta tags
+        const metaTitleMatch = html.match(/<meta property="og:title" content="([^"]+)"/i)
+        if (metaTitleMatch) {
+          const title = metaTitleMatch[1].trim()
+          if (title && title !== 'Google Sheets') {
+            console.log('✅ Retrieved sheet title from HTML meta:', title)
+            return title
+          }
+        }
+
+        // Look for title in the page title tag
+        const titleMatch = html.match(/<title>([^<]+)<\/title>/i)
+        if (titleMatch) {
+          let title = titleMatch[1].trim()
+          // Remove " - Google Sheets" suffix if present
+          title = title.replace(/\s*-\s*Google Sheets\s*$/i, '')
+          if (title && title !== 'Google Sheets') {
+            console.log('✅ Retrieved sheet title from HTML title:', title)
+            return title
+          }
+        }
+      }
+    } catch (htmlError) {
+      console.log('⚠️ HTML scraping failed:', htmlError)
+    }
+
+    // Last resort: extract from URL fragments if available
+    const urlMatch = sheetUrl.match(/[?&]title=([^&]+)/)
+    if (urlMatch) {
+      return decodeURIComponent(urlMatch[1])
+    }
+
+    console.log('⚠️ Could not retrieve sheet title, using default')
+    return 'Google Sheet'
+
+  } catch (error) {
+    console.error('Error getting sheet title:', error)
+    return 'Google Sheet'
+  }
+}
+
 function convertToCsvUrl(sheetUrl: string): string {
   const spreadsheetId = extractSpreadsheetId(sheetUrl)
 

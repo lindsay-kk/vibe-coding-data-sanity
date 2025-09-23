@@ -144,42 +144,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      // Create file record for Google Sheet
-      const { data: fileData, error: fileError } = await supabaseAdmin
-        .from('files')
-        .insert({
-          user_id: user.id,
-          filename: 'google_sheet',
-          original_filename: 'Google Sheet',
-          file_size: 0,
-          google_sheet_url: googleSheetUrl
-        })
-        .select()
-        .single()
-
-      if (fileError) {
-        console.error('File record error:', fileError)
-        return NextResponse.json({ error: 'Failed to create file record' }, { status: 500 })
-      }
-
-      // Create report record
-      const { data: reportData, error: reportError } = await supabaseAdmin
-        .from('reports')
-        .insert({
-          file_id: fileData.id,
-          user_id: user.id,
-          status: 'processing',
-          google_sheet_url: googleSheetUrl
-        })
-        .select()
-        .single()
-
-      if (reportError) {
-        console.error('Report record error:', reportError)
-        return NextResponse.json({ error: 'Failed to create report record' }, { status: 500 })
-      }
-
-      // Test if the sheet is accessible without OAuth
+      // Test if the sheet is accessible without OAuth first
       try {
         console.log('🧪 Testing sheet access:', googleSheetUrl)
         const { processGoogleSheet } = await import('@/lib/google-sheets')
@@ -192,9 +157,55 @@ export async function POST(request: NextRequest) {
 
         await Promise.race([testPromise, timeoutPromise])
 
-        console.log('✅ Sheet is publicly accessible, starting normal processing')
+        console.log('✅ Sheet is publicly accessible, creating report and processing')
 
-        // If successful, use normal processing
+        // Try to get the actual sheet title
+        const { getGoogleSheetTitle } = await import('@/lib/google-sheets')
+        let sheetTitle = 'Google Sheet'
+        try {
+          sheetTitle = await getGoogleSheetTitle(googleSheetUrl)
+        } catch (titleError) {
+          console.log('Could not get sheet title, using default')
+        }
+
+        // Create file record for Google Sheet
+        const { data: fileData, error: fileError } = await supabaseAdmin
+          .from('files')
+          .insert({
+            user_id: user.id,
+            filename: 'google_sheet',
+            original_filename: sheetTitle,
+            file_size: 0,
+            google_sheet_url: googleSheetUrl
+          })
+          .select()
+          .single()
+
+        if (fileError) {
+          console.error('File record error:', fileError)
+          return NextResponse.json({ error: 'Failed to create file record' }, { status: 500 })
+        }
+
+        // Create report record
+        const { data: reportData, error: reportError } = await supabaseAdmin
+          .from('reports')
+          .insert({
+            file_id: fileData.id,
+            user_id: user.id,
+            status: 'processing',
+            google_sheet_url: googleSheetUrl,
+            document_name: sheetTitle,
+            document_type: 'google_sheet'
+          })
+          .select()
+          .single()
+
+        if (reportError) {
+          console.error('Report record error:', reportError)
+          return NextResponse.json({ error: 'Failed to create report record' }, { status: 500 })
+        }
+
+        // Start processing
         fetch(`${process.env.NEXTAUTH_URL}/api/process/${reportData.id}`, {
           method: 'POST',
           headers: {
@@ -212,7 +223,7 @@ export async function POST(request: NextRequest) {
       } catch (testError) {
         console.log('🔐 Sheet requires authentication, triggering OAuth')
 
-        // If access fails, require OAuth
+        // Don't create any records - just return OAuth requirement
         return NextResponse.json({
           error: 'oauth_required',
           message: 'This Google Sheet requires authentication. Please use OAuth to access private sheets.',

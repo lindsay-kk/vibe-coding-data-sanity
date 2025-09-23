@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:ui.shadcn.com)"
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(node:*)",
+      "Bash(git commit:*)",
+      "Read(//Users/linhkieu/Desktop/**)"
     ],
     "deny": [],
     "ask": []
