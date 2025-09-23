@@ -6,9 +6,11 @@ import { Switch } from '@/components/ui/switch'
 
 export function ThemeSwitcher() {
   const [isDark, setIsDark] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   // Initialize theme on component mount
   useEffect(() => {
+    setMounted(true)
     // Check if user has a saved theme preference
     const savedTheme = localStorage.getItem('theme')
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -31,6 +33,11 @@ export function ThemeSwitcher() {
   const handleThemeChange = (checked: boolean) => {
     setIsDark(checked)
     updateTheme(checked)
+  }
+
+  // Don't render on server to avoid hydration mismatch
+  if (!mounted) {
+    return null
   }
 
   return (

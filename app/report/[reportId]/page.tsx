@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/auth'
 import {
@@ -14,10 +14,13 @@ import {
   Users,
   FileX,
   Zap,
-  Blend
+  Blend,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import type { User } from '@supabase/supabase-js'
 
@@ -45,6 +48,8 @@ interface ReportData {
       inconsistent_formats: number
       outliers: number
       type_mismatches: number
+      invalid_values: number
+      cross_field_contamination: number
       total_rows: number
       total_columns: number
     }
@@ -76,6 +81,7 @@ export default function ReportPage() {
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [polling, setPolling] = useState(false)
+  const [expandedColumns, setExpandedColumns] = useState<Set<string>>(new Set())
 
   const supabase = createClient()
 
@@ -169,6 +175,18 @@ export default function ReportPage() {
       window.open(reportData.annotations.google_sheet_url, '_blank')
     }
   }
+
+  const toggleColumnExpansion = useCallback((columnName: string) => {
+    setExpandedColumns(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(columnName)) {
+        newSet.delete(columnName)
+      } else {
+        newSet.add(columnName)
+      }
+      return newSet
+    })
+  }, [])
 
   if (loading) {
     return (
@@ -366,17 +384,52 @@ export default function ReportPage() {
 
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="size-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="size-6 text-green-600" />
-                </div>
-                <h4 className="text-lg font-semibold text-foreground mb-2">Total Issues</h4>
-                <p className="text-2xl font-bold text-foreground">
-                  {(issues.summary.missing_values +
-                    issues.summary.duplicates +
-                    issues.summary.inconsistent_formats +
-                    issues.summary.outliers +
-                    issues.summary.type_mismatches).toLocaleString()}
-                </p>
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <div className="cursor-pointer">
+                      <div className="size-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <TrendingUp className="size-6 text-green-600" />
+                      </div>
+                      <h4 className="text-lg font-semibold text-foreground mb-2">Total Issues</h4>
+                      <p className="text-2xl font-bold text-foreground">
+                        {(issues.summary.missing_values +
+                          issues.summary.duplicates +
+                          issues.summary.inconsistent_formats +
+                          issues.summary.outliers +
+                          issues.summary.type_mismatches +
+                          (issues.summary.invalid_values || 0) +
+                          (issues.summary.cross_field_contamination || 0)).toLocaleString()}
+                      </p>
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold">Issue Breakdown</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Invalid Values</span>
+                          <span className="text-sm font-medium">{(issues.summary.invalid_values || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Cross-field Issues</span>
+                          <span className="text-sm font-medium">{(issues.summary.cross_field_contamination || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Type Mismatches</span>
+                          <span className="text-sm font-medium">{issues.summary.type_mismatches.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Inconsistent Formats</span>
+                          <span className="text-sm font-medium">{issues.summary.inconsistent_formats.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Outliers</span>
+                          <span className="text-sm font-medium">{issues.summary.outliers.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               </CardContent>
             </Card>
           </div>
@@ -428,22 +481,51 @@ export default function ReportPage() {
                 {Object.entries(issues.issues_json).map(([columnName, columnIssues]) => {
                   if (columnIssues.length === 0) return null
 
+                  const isExpanded = expandedColumns.has(columnName)
+                  const displayedIssues = isExpanded ? columnIssues : columnIssues.slice(0, 10)
+                  const hasMoreIssues = columnIssues.length > 10
+
                   return (
                     <div key={columnName} className="border-l-4 border-primary pl-4">
-                      <h4 className="text-lg font-medium text-foreground mb-3">
-                        {columnName} ({columnIssues.length} issues)
-                      </h4>
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-lg font-medium text-foreground">
+                          {columnName} ({columnIssues.length} issues)
+                        </h4>
+                        {hasMoreIssues && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleColumnExpansion(columnName)}
+                            className="flex items-center gap-2"
+                          >
+                            {isExpanded ? (
+                              <>
+                                <ChevronUp className="w-4 h-4" />
+                                Show Less
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="w-4 h-4" />
+                                Show All ({columnIssues.length})
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
 
                       <div className="grid gap-2">
-                        {columnIssues.slice(0, 10).map((issue, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg border">
+                        {displayedIssues.map((issue, index) => (
+                          <div key={`${columnName}-${index}-${issue.row}`} className="flex items-center justify-between p-3 bg-muted rounded-lg border">
                             <div className="flex items-center space-x-3">
                               <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium ${
                                 issue.issue === 'missing_value' ? 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/30' :
                                 issue.issue === 'duplicate' ? 'bg-red-500/20 text-red-600 border border-red-500/30' :
                                 issue.issue === 'inconsistent_format' ? 'bg-blue-500/20 text-blue-600 border border-blue-500/30' :
                                 issue.issue === 'outlier' ? 'bg-orange-500/20 text-orange-600 border border-orange-500/30' :
-                                'bg-purple-500/20 text-purple-600 border border-purple-500/30'
+                                issue.issue === 'type_mismatch' ? 'bg-indigo-500/20 text-indigo-600 border border-indigo-500/30' :
+                                issue.issue === 'invalid_value' ? 'bg-orange-500/20 text-orange-600 border border-orange-500/30' :
+                                issue.issue === 'cross_field_contamination' ? 'bg-purple-500/20 text-purple-600 border border-purple-500/30' :
+                                'bg-gray-500/20 text-gray-600 border border-gray-500/30'
                               }`}>
                                 {issue.issue.replace('_', ' ')}
                               </span>
@@ -455,12 +537,6 @@ export default function ReportPage() {
                             )}
                           </div>
                         ))}
-
-                        {columnIssues.length > 10 && (
-                          <div className="text-sm text-muted-foreground text-center py-2">
-                            ... and {columnIssues.length - 10} more issues
-                          </div>
-                        )}
                       </div>
                     </div>
                   )

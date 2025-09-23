@@ -166,6 +166,10 @@ export class GoogleSheetsService {
         return { red: 1, green: 0.65, blue: 0 } // Orange
       case 'type_mismatch':
         return { red: 1, green: 0, blue: 1 } // Magenta
+      case 'invalid_value':
+        return { red: 1, green: 0.5, blue: 0 } // Dark orange
+      case 'cross_field_contamination':
+        return { red: 0.6, green: 0.2, blue: 0.8 } // Purple
       default:
         return { red: 0.8, green: 0.8, blue: 0.8 } // Light gray
     }
@@ -216,6 +220,8 @@ export class GoogleSheetsService {
         ['Format Issues', sanityReport.summary.inconsistent_formats],
         ['Outliers', sanityReport.summary.outliers],
         ['Type Mismatches', sanityReport.summary.type_mismatches],
+        ['Invalid Values', sanityReport.summary.invalid_values || 0],
+        ['Cross-field Issues', sanityReport.summary.cross_field_contamination || 0],
         [''],
         ['Issues by Column:'],
       ]
