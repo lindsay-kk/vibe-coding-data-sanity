@@ -461,7 +461,9 @@ export default function ReportPage() {
                   <h4 className="text-lg font-medium text-foreground mb-3">Recommendations</h4>
                   <div className="prose prose-sm text-muted-foreground">
                     {insights.gemini_recommendations.split('\n').map((line, index) => (
-                      <p key={index} className="mb-2">{line}</p>
+                      <p key={index} className="mb-2" dangerouslySetInnerHTML={{
+                        __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      }} />
                     ))}
                   </div>
                 </div>
