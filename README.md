@@ -18,11 +18,11 @@
 ### Login Screen
 ![Login Screen](screenshots/screenshots/login-screen-light.png)
 
-### Reports History
-![Reports History](screenshots/screenshots/reports-history-light.png)
-
 ### Detailed Reports
 ![Report Screen](screenshots/screenshots/report-screen-light.png)
+
+### Reports History
+![Reports History](screenshots/screenshots/reports-history-light.png)
 
 ## 🚀 Built With
 
