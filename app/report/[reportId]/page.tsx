@@ -407,6 +407,14 @@ export default function ReportPage() {
                       <h4 className="text-sm font-semibold">Issue Breakdown</h4>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Missing Values</span>
+                          <span className="text-sm font-medium">{issues.summary.missing_values.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Duplicates</span>
+                          <span className="text-sm font-medium">{issues.summary.duplicates.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">Invalid Values</span>
                           <span className="text-sm font-medium">{(issues.summary.invalid_values || 0).toLocaleString()}</span>
                         </div>
